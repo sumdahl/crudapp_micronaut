@@ -3,6 +3,7 @@ package com.micronaut.crud.application.dto;
 import io.micronaut.serde.annotation.Serdeable;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * User Data Transfer Object - Application layer
@@ -10,7 +11,7 @@ import java.time.LocalDateTime;
 @Serdeable
 public class UserDTO {
 
-    private Long id;
+    private UUID id;
     private String username;
     private String email;
     private String firstName;
@@ -23,7 +24,7 @@ public class UserDTO {
     public UserDTO() {
     }
 
-    public UserDTO(Long id, String username, String email, String firstName,
+    public UserDTO(UUID id, String username, String email, String firstName,
             String lastName, Boolean active, LocalDateTime createdAt,
             LocalDateTime updatedAt) {
         this.id = id;
@@ -37,11 +38,11 @@ public class UserDTO {
     }
 
     // Getters and Setters
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 

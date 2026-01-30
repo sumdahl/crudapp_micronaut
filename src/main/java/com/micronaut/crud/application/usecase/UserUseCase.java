@@ -12,6 +12,7 @@ import jakarta.transaction.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -46,7 +47,7 @@ public class UserUseCase {
         return userMapper.toDTO(savedUser);
     }
 
-    public Optional<UserDTO> getUserById(Long id) {
+    public Optional<UserDTO> getUserById(UUID id) {
         return userRepository.findById(id)
                 .map(userMapper::toDTO);
     }
@@ -64,7 +65,7 @@ public class UserUseCase {
     }
 
     @Transactional
-    public Optional<UserDTO> updateUser(Long id, UpdateUserRequest request) {
+    public Optional<UserDTO> updateUser(UUID id, UpdateUserRequest request) {
         return userRepository.findById(id)
                 .map(existingUser -> {
                     existingUser.setUsername(request.getUsername());
@@ -83,7 +84,7 @@ public class UserUseCase {
     }
 
     @Transactional
-    public boolean deleteUser(Long id) {
+    public boolean deleteUser(UUID id) {
         if (userRepository.existsById(id)) {
             userRepository.deleteById(id);
             return true;

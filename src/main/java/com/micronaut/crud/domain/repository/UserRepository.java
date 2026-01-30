@@ -2,16 +2,17 @@ package com.micronaut.crud.domain.repository;
 
 import com.micronaut.crud.domain.entity.User;
 import io.micronaut.data.annotation.Repository;
-import io.micronaut.data.jpa.repository.JpaRepository;
+import io.micronaut.data.repository.CrudRepository;
 
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * User repository interface - Domain layer
- * Micronaut Data JPA will provide the implementation
+ * Micronaut Data will automatically implement this interface
  */
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends CrudRepository<User, UUID> {
 
     Optional<User> findByUsername(String username);
 

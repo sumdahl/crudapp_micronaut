@@ -28,6 +28,8 @@ dependencies {
     runtimeOnly("org.hibernate.validator:hibernate-validator:8.0.1.Final")
     testImplementation("io.micronaut:micronaut-http-client")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    implementation("io.micronaut.flyway:micronaut-flyway")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql")
 }
 
 

@@ -48,6 +48,7 @@ src/main/java/com/micronaut/crud/
 - **Java Version**: 17
 - **Database**: PostgreSQL
 - **ORM**: Micronaut Data JPA (Hibernate)
+- **Migrations**: Flyway
 - **Serialization**: Micronaut Serialization (Jackson)
 - **Testing**: JUnit 5
 - **Validation**: Jakarta Bean Validation
@@ -57,6 +58,8 @@ src/main/java/com/micronaut/crud/
 - ✅ Clean Architecture structure
 - ✅ RESTful API with full CRUD operations
 - ✅ PostgreSQL database integration
+- ✅ **UUID primary keys** for better scalability
+- ✅ **Flyway database migrations** for version-controlled schema management
 - ✅ JPA/Hibernate ORM with HikariCP connection pooling
 - ✅ Separate DTOs for create/update operations
 - ✅ Global exception handling with standardized error responses
@@ -84,11 +87,17 @@ CREATE DATABASE crudapp_db;
 datasources.default.url=jdbc:postgresql://localhost:5432/crudapp_db
 datasources.default.username=postgres
 datasources.default.password=your_password
-datasources.default.driverClassName=org.postgresql.Driver
+datasources.default.driver-class-name=org.postgresql.Driver
 
-jpa.default.properties.hibernate.hbm2ddl.auto=update
+# Schema validation (Flyway handles migrations)
+jpa.default.properties.hibernate.hbm2ddl.auto=validate
 jpa.default.properties.hibernate.show_sql=true
+
+# Enable Flyway migrations
+flyway.datasources.default.enabled=true
 ```
+
+3. Flyway will automatically create the schema on first run
 
 ## Running the Application
 
@@ -101,6 +110,37 @@ jpa.default.properties.hibernate.show_sql=true
 ```
 
 The application will start on `http://localhost:8080`
+
+## Database Migrations
+
+This project uses **Flyway** for database schema version control.
+
+### How It Works
+
+1. Migration files are in `src/main/resources/db/migration/`
+2. On application startup, Flyway automatically runs pending migrations
+3. Tracks executed migrations in `flyway_schema_history` table
+
+### Current Migrations
+
+- **V1__create_users_table.sql** - Creates users table with UUID primary keys
+
+### Creating New Migrations
+
+```bash
+# Create new migration file
+touch src/main/resources/db/migration/V2__your_migration_name.sql
+
+# Example: Add a new field
+echo "ALTER TABLE users ADD COLUMN phone VARCHAR(20);" > src/main/resources/db/migration/V2__add_phone_field.sql
+
+# Run application - Flyway executes V2 automatically
+./gradlew run
+```
+
+**Naming Convention**: `V{version}__{description}.sql`
+
+For detailed migration guide, see [docs/FLYWAY_GUIDE.md](docs/FLYWAY_GUIDE.md)
 
 ## API Endpoints
 

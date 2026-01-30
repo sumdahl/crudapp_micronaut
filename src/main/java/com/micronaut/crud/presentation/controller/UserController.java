@@ -10,6 +10,7 @@ import io.micronaut.http.annotation.*;
 import jakarta.validation.Valid;
 
 import java.util.List;
+import java.util.UUID;
 
 @Controller("/api/users")
 public class UserController {
@@ -28,7 +29,7 @@ public class UserController {
     }
 
     @Get("/{id}")
-    public HttpResponse<UserDTO> getUserById(@PathVariable Long id) {
+    public HttpResponse<UserDTO> getUserById(@PathVariable UUID id) {
         return userUseCase.getUserById(id)
                 .map(HttpResponse::ok)
                 .orElse(HttpResponse.notFound());
@@ -48,7 +49,7 @@ public class UserController {
     }
 
     @Put("/{id}")
-    public HttpResponse<UserDTO> updateUser(@PathVariable Long id, @Valid @Body UpdateUserRequest request) {
+    public HttpResponse<UserDTO> updateUser(@PathVariable UUID id, @Valid @Body UpdateUserRequest request) {
         return userUseCase.updateUser(id, request)
                 .map(HttpResponse::ok)
                 .orElse(HttpResponse.notFound());
@@ -56,7 +57,7 @@ public class UserController {
 
     @Delete("/{id}")
     @Status(HttpStatus.NO_CONTENT)
-    public HttpResponse<Void> deleteUser(@PathVariable Long id) {
+    public HttpResponse<Void> deleteUser(@PathVariable UUID id) {
         boolean deleted = userUseCase.deleteUser(id);
         return deleted ? HttpResponse.noContent() : HttpResponse.notFound();
     }
