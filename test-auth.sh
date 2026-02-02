@@ -16,11 +16,11 @@ echo "1. Testing Registration..."
 REGISTER_RESPONSE=$(curl -s -X POST "$BASE_URL/register" \
   -H "Content-Type: application/json" \
   -d '{
-    "username": "testuser",
-    "email": "test@example.com",
-    "password": "password123",
-    "firstName": "Test",
-    "lastName": "User"
+    "username": "sumdahl",
+    "email": "sumirandahal46@gmail.com",
+    "password": "Sumiran143@@",
+    "firstName": "Sumiran",
+    "lastName": "Dahal"
   }')
 
 echo "Registration Response:"
@@ -32,8 +32,8 @@ echo "2. Testing Login..."
 LOGIN_RESPONSE=$(curl -s -X POST "$BASE_URL/login" \
   -H "Content-Type: application/json" \
   -d '{
-    "email": "test@example.com",
-    "password": "password123"
+    "email": "sumirandahal46@gmail.com",
+    "password": "Sumiran143@@"
   }' \
   -c "$COOKIES_FILE")
 

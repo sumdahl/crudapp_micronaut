@@ -2,6 +2,8 @@ package com.micronaut.crud.application.service;
 
 import com.micronaut.crud.domain.entity.RefreshToken;
 import com.micronaut.crud.domain.repository.RefreshTokenRepository;
+import com.micronaut.crud.presentation.dto.RefreshResult;
+import io.micronaut.scheduling.annotation.Scheduled;
 import jakarta.inject.Singleton;
 import jakarta.transaction.Transactional;
 import org.mindrot.jbcrypt.BCrypt;
@@ -42,49 +44,41 @@ public class RefreshTokenService {
     }
 
     @Transactional
-    public Optional<String> validateAndRotate(String plainToken, UUID userId) {
-        if (plainToken == null || plainToken.isEmpty()) {
+    public Optional<UUID> validateAndRotate(String plainToken) {
+        if (plainToken == null || plainToken.isBlank()) {
             return Optional.empty();
         }
 
-        Optional<RefreshToken> tokenOpt = refreshTokenRepository.findByTokenHash(
-                hashTokenForLookup(plainToken));
 
-        if (tokenOpt.isEmpty()) {
-            return Optional.empty();
-        }
+        var validTokens = refreshTokenRepository.findAllValidTokens(LocalDateTime.now());
 
-        RefreshToken token = tokenOpt.get();
+        for (RefreshToken token : validTokens) {
+            if (BCrypt.checkpw(plainToken, token.getTokenHash())) {
+                // Revoke current token
+                token.setRevoked(true);
+                refreshTokenRepository.update(token);
 
-        if (!token.getUserId().equals(userId) || !token.isValid()) {
-            return Optional.empty();
-        }
+                // Generate new token
+                generateAndStore(token.getUserId());
 
-        token.setRevoked(true);
-        refreshTokenRepository.update(token);
-
-        String newToken = generateAndStore(userId);
-        return Optional.of(newToken);
-    }
-
-    public Optional<UUID> verifyToken(String plainToken) {
-        if (plainToken == null || plainToken.isEmpty()) {
-            return Optional.empty();
-        }
-
-        String hashedToken = hashTokenForLookup(plainToken);
-        Optional<RefreshToken> tokenOpt = refreshTokenRepository.findByTokenHash(hashedToken);
-
-        if (tokenOpt.isEmpty()) {
-            return Optional.empty();
-        }
-
-        RefreshToken token = tokenOpt.get();
-        if (token.isValid()) {
-            return Optional.of(token.getUserId());
+                return Optional.of(token.getUserId());
+            }
         }
 
         return Optional.empty();
+    }
+
+    @Transactional
+    public Optional<RefreshResult> validateAndRotateWithUser(String plainToken){
+        Optional<UUID> userIdOpt = validateAndRotate(plainToken);
+        if(userIdOpt.isEmpty()){
+            return Optional.empty();
+        }
+
+        UUID userId = userIdOpt.get();
+        String newToken = generateAndStore(userId);
+
+        return Optional.of(new RefreshResult(userId, newToken));
     }
 
     @Transactional
@@ -92,6 +86,7 @@ public class RefreshTokenService {
         refreshTokenRepository.deleteByUserId(userId);
     }
 
+    @Scheduled(fixedDelay = "1h")
     @Transactional
     public void cleanup() {
         refreshTokenRepository.deleteExpiredTokens(LocalDateTime.now());
@@ -101,4 +96,14 @@ public class RefreshTokenService {
     private String hashTokenForLookup(String plainToken) {
         return plainToken;
     }
+
+    public boolean validate(String plainToken) {
+        if (plainToken == null || plainToken.isBlank()) return false;
+
+        return refreshTokenRepository.findAllValidTokens(LocalDateTime.now())
+                .stream()
+                .anyMatch(rt -> BCrypt.checkpw(plainToken, rt.getTokenHash()));
+    }
+
+
 }

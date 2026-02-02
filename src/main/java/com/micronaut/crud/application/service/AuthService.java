@@ -9,6 +9,7 @@ import jakarta.inject.Singleton;
 import jakarta.transaction.Transactional;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Singleton
 public class AuthService {
@@ -51,6 +52,11 @@ public class AuthService {
                 .map(this::mapToUserResponse);
     }
 
+    public Optional<UserResponse> getUserById(UUID userId){
+        return userRepository.findById(userId)
+                .map(this::mapToUserResponse);
+    }
+
     public Optional<User> verifyCredentials(String email, String password) {
         Optional<User> userOpt = userRepository.findByEmail(email);
 
@@ -77,4 +83,6 @@ public class AuthService {
                 user.getLastName(),
                 user.getActive());
     }
+
 }
+

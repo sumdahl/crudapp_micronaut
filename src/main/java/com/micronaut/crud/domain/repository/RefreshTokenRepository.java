@@ -21,4 +21,7 @@ public interface RefreshTokenRepository extends CrudRepository<RefreshToken, UUI
 
     @Query("DELETE FROM RefreshToken rt WHERE rt.revoked = true")
     void deleteRevokedTokens();
+
+    @Query("SELECT rt FROM RefreshToken rt WHERE rt.revoked = false AND rt.expiresAt > :now")
+    java.util.List<RefreshToken> findAllValidTokens(LocalDateTime now);
 }
