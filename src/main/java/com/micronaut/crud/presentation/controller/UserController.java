@@ -4,15 +4,21 @@ import com.micronaut.crud.application.dto.CreateUserRequest;
 import com.micronaut.crud.application.dto.UpdateUserRequest;
 import com.micronaut.crud.application.dto.UserDTO;
 import com.micronaut.crud.application.usecase.UserUseCase;
+
+import io.micronaut.data.model.Page;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.*;
+import io.micronaut.security.annotation.Secured;
+import io.micronaut.security.rules.SecurityRule;
 import jakarta.validation.Valid;
 
-import java.util.List;
+import io.micronaut.data.model.Pageable;
+
 import java.util.UUID;
 
 @Controller("/api/users")
+@Secured(SecurityRule.IS_AUTHENTICATED)
 public class UserController {
 
     private final UserUseCase userUseCase;
@@ -29,6 +35,7 @@ public class UserController {
     }
 
     @Get("/{id}")
+    @Secured(SecurityRule.IS_AUTHENTICATED)
     public HttpResponse<UserDTO> getUserById(@PathVariable UUID id) {
         return userUseCase.getUserById(id)
                 .map(HttpResponse::ok)
@@ -36,6 +43,7 @@ public class UserController {
     }
 
     @Get("/username/{username}")
+    @Secured(SecurityRule.IS_AUTHENTICATED)
     public HttpResponse<UserDTO> getUserByUsername(@PathVariable String username) {
         return userUseCase.getUserByUsername(username)
                 .map(HttpResponse::ok)
@@ -43,8 +51,8 @@ public class UserController {
     }
 
     @Get
-    public HttpResponse<List<UserDTO>> getAllUsers() {
-        List<UserDTO> users = userUseCase.getAllUsers();
+    public HttpResponse<Page<UserDTO>> getAllUsers(Pageable pageable) {
+        Page<UserDTO> users = userUseCase.getAllUsers(pageable);
         return HttpResponse.ok(users);
     }
 

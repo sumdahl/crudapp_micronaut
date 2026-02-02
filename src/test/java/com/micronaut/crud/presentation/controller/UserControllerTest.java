@@ -24,11 +24,16 @@ class UserControllerTest {
 
     @Test
     void testGetAllUsersEndpoint() {
-        // Test that the endpoint is accessible
+        // Test that the endpoint now requires authentication
         HttpRequest<?> request = HttpRequest.GET("/api/users");
-        var response = client.toBlocking().exchange(request);
 
-        assertEquals(HttpStatus.OK, response.status());
+        // With JWT security enabled, this should throw an exception with UNAUTHORIZED
+        // status
+        io.micronaut.http.client.exceptions.HttpClientResponseException exception = assertThrows(
+                io.micronaut.http.client.exceptions.HttpClientResponseException.class,
+                () -> client.toBlocking().exchange(request));
+
+        assertEquals(HttpStatus.UNAUTHORIZED, exception.getStatus());
     }
 
     @Test
