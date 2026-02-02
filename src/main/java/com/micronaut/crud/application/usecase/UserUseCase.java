@@ -7,13 +7,14 @@ import com.micronaut.crud.domain.entity.User;
 import com.micronaut.crud.domain.exception.DuplicateResourceException;
 import com.micronaut.crud.domain.repository.UserRepository;
 import com.micronaut.crud.infrastructure.mapper.UserMapper;
+import io.micronaut.data.model.Page;
 import jakarta.inject.Singleton;
 import jakarta.transaction.Transactional;
+import io.micronaut.data.model.Pageable;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
+
 
 /**
  * User use case (service) - Application layer
@@ -57,11 +58,16 @@ public class UserUseCase {
                 .map(userMapper::toDTO);
     }
 
-    public List<UserDTO> getAllUsers() {
-        return userRepository.findAll()
-                .stream()
-                .map(userMapper::toDTO)
-                .collect(Collectors.toList());
+//    public List<UserDTO> getAllUsers() {
+//        return userRepository.findAll()
+//                .stream()
+//                .map(userMapper::toDTO)
+//                .collect(Collectors.toList());
+//    }
+
+    public Page<UserDTO> getAllUsers(Pageable pageable){
+        Page<User> userPage = userRepository.findAll(pageable);
+        return userPage.map(userMapper::toDTO);
     }
 
     @Transactional
@@ -75,7 +81,7 @@ public class UserUseCase {
 
                     // Only update password if it's provided
                     if (request.getPassword() != null && !request.getPassword().isEmpty()) {
-                        existingUser.setPassword(request.getPassword());
+                        existingUser.setPasswordHash(request.getPassword());
                     }
 
                     User updatedUser = userRepository.update(existingUser);

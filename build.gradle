@@ -30,6 +30,13 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     implementation("io.micronaut.flyway:micronaut-flyway")
     runtimeOnly("org.flywaydb:flyway-database-postgresql")
+    
+    // JWT Security
+    implementation("io.micronaut.security:micronaut-security-jwt")
+    annotationProcessor("io.micronaut.security:micronaut-security-annotations")
+    
+    // Password Hashing
+    implementation("org.mindrot:jbcrypt:0.4")
 }
 
 
