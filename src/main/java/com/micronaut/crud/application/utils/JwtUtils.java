@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class JwtUtils {
 
-    
+
     private static final long ACCESS_TOKEN_EXPIRY_SECONDS = 5 * 60; // 5 minutes
 
     public static Map<String, Object> buildClaims(UserResponse user) {
